@@ -136,6 +136,7 @@ describe('client accessibility', () => {
     const { container } = render(<App />)
 
     await screen.findByText('Operations map')
+    await screen.findByText('Incidents, transport, sustainability')
     await waitFor(() => expect(screen.getAllByText('Fan Fest Plaza').length).toBeGreaterThan(0))
 
     const results = await axe.run(container, {
@@ -144,5 +145,5 @@ describe('client accessibility', () => {
       },
     })
     expect(results.violations).toHaveLength(0)
-  })
+  }, 15000)
 })

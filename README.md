@@ -57,6 +57,7 @@ Main screens:
 
 - **Operations map:** interactive stadium map with live risk markers and selected-zone details.
 - **Zone priorities:** table view of load, queue, staff coverage, and risk scores.
+- **Venue signals:** open incidents, transit load, arrival timing, and sustainability readiness.
 - **Ops briefing:** GenAI decision support for staff actions and public messaging.
 - **Accessible route:** route planner that respects mobility requirements and crowd pressure.
 
@@ -104,8 +105,10 @@ npm run check
 Current test coverage focus:
 
 - Risk scoring and snapshot metrics
+- Route risk handling for both origin and destination zones
 - Accessible route planning
-- API validation and safe AI fallback
+- API validation, input bounds, and safe AI fallback
+- Multilingual deterministic decision support
 - Client accessibility smoke test with axe-core
 
 ## Security
@@ -113,6 +116,7 @@ Current test coverage focus:
 - Secrets stay server-side in environment variables.
 - AI endpoint has rate limiting and an 8-second timeout.
 - Request bodies are capped at 32 KB.
+- Route endpoint inputs are length-bounded and validated.
 - All user input is validated with Zod before domain logic runs.
 - AI output is parsed and schema-validated before rendering.
 - Helmet sets defensive HTTP headers.
@@ -124,6 +128,7 @@ Current test coverage focus:
 
 - Risk analytics are deterministic and lightweight.
 - AI responses are cached briefly to reduce repeated model calls.
+- The AI cache is bounded and prunes expired entries.
 - Route planning uses a small weighted graph and avoids unnecessary external services.
 - The frontend fetches compact JSON payloads and renders from local state.
 - Demo mode avoids network dependency during evaluation.
@@ -135,6 +140,7 @@ Current test coverage focus:
 - Icon buttons include accessible labels.
 - Controls use native select, checkbox, button, and textarea elements.
 - The route planner supports wheelchair, low-vision, and sensory-sensitive profiles.
+- AI-generated multilingual text uses automatic text direction where it is rendered.
 - The UI is responsive across desktop and mobile viewport widths.
 - Automated axe coverage is included in `tests/accessibility.test.tsx`.
 

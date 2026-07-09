@@ -534,7 +534,9 @@ textarea {
 .decision-output p,
 .route-output p,
 .decision-output small,
-.route-output small {
+.route-output small,
+.signal-row span,
+.bar-row span {
   color: var(--muted);
   line-height: 1.45;
 }
@@ -566,6 +568,31 @@ textarea {
   display: block;
   margin-bottom: 4px;
   color: var(--ink);
+}
+
+.briefing-grid span[dir] {
+  display: block;
+}
+
+.decision-assumptions {
+  border: 1px solid #dce4dc;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdf9;
+}
+
+.decision-assumptions summary {
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.decision-assumptions p {
+  margin: 8px 0;
+}
+
+.decision-assumptions ul {
+  margin: 0;
+  padding-left: 18px;
 }
 
 .route-summary {
@@ -611,6 +638,84 @@ textarea {
   font-weight: 850;
 }
 
+.signal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.signal-column {
+  min-width: 0;
+}
+
+.signal-column:last-child {
+  grid-column: span 2;
+}
+
+.signal-column h3 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+.signal-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signal-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  min-height: 62px;
+  border: 1px solid #e0e6df;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdf9;
+}
+
+.signal-row svg {
+  color: var(--teal);
+  margin-top: 2px;
+}
+
+.signal-row strong,
+.bar-row strong {
+  display: block;
+}
+
+.sustainability-bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bar-row {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #e0e6df;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdf9;
+}
+
+.bar-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbe5dd;
+}
+
+.bar-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), var(--teal));
+}
+
 .spin {
   animation: spin 1s linear infinite;
 }
@@ -632,6 +737,15 @@ textarea {
 
   .workspace-side {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .signal-grid,
+  .sustainability-bars {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-column:last-child {
+    grid-column: auto;
   }
 }
 

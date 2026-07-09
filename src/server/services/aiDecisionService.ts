@@ -30,6 +30,7 @@ type GeminiResponse = {
 }
 
 const decisionCache = new Map<string, CacheRecord>()
+const maxDecisionCacheEntries = 128
 
 const translations: Record<LanguageCode, { publicPrefix: string; crowd: string; accessibility: string }> = {
   en: {
@@ -132,6 +133,22 @@ function buildCacheKey(request: DecisionRequest, snapshot: StadiumSnapshot) {
 }
 
 function storeCache(cacheKey: string, response: DecisionResponse) {
+  for (const [key, record] of decisionCache.entries()) {
+    if (record.expiresAt <= Date.now()) {
+      decisionCache.delete(key)
+    }
+  }
+
+  while (decisionCache.size >= maxDecisionCacheEntries) {
+    const oldestKey = decisionCache.keys().next().value
+
+    if (!oldestKey) {
+      break
+    }
+
+    decisionCache.delete(oldestKey)
+  }
+
   decisionCache.set(cacheKey, {
     expiresAt: Date.now() + config.aiCacheTtlMs,
     response,

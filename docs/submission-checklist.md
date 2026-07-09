@@ -10,4 +10,5 @@
 - Efficiency choices documented
 - Testing commands documented
 - Accessibility choices documented
+- Incident, transport, sustainability, accessibility, and crowd workflows visible in the UI
 - Local validation command: `npm run check`

@@ -4,5 +4,5 @@ import { config } from './config'
 const app = createApp()
 
 app.listen(config.port, '127.0.0.1', () => {
-  console.log(`Matchday Ops AI API listening on http://127.0.0.1:${config.port}`)
+  console.info(`Matchday Ops AI API listening on http://127.0.0.1:${config.port}`)
 })

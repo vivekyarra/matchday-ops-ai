@@ -7,10 +7,10 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ZodError } from 'zod'
-import { config, isProduction } from './config'
+import { config } from './config'
 import { buildSnapshot } from './services/analytics'
 import { createDecisionSupport } from './services/aiDecisionService'
-import { listRouteOptions, planRoute } from './services/routePlanner'
+import { listRouteOptions, planRoute, RoutePlanningError } from './services/routePlanner'
 import { DecisionRequestSchema, RouteRequestSchema } from '../shared/schemas'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -41,9 +41,11 @@ export function createApp() {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'"],
+          styleSrcElem: ["'self'"],
+          styleSrcAttr: ["'unsafe-inline'"],
           imgSrc: ["'self'", 'data:'],
-          connectSrc: ["'self'", 'http://127.0.0.1:8787', 'http://127.0.0.1:5173'],
+          connectSrc: ["'self'"],
         },
       },
     }),
@@ -146,10 +148,9 @@ const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => 
     return
   }
 
-  const status = error instanceof Error && error.message.includes('route endpoint') ? 400 : 500
+  const status = error instanceof RoutePlanningError ? 400 : 500
 
   response.status(status).json({
     error: status === 400 ? error.message : 'Internal server error',
-    detail: isProduction() ? undefined : error instanceof Error ? error.message : String(error),
   })
 }

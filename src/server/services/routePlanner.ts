@@ -8,6 +8,13 @@ type QueueItem = {
   path: RouteEdge[]
 }
 
+export class RoutePlanningError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'RoutePlanningError'
+  }
+}
+
 const zoneNameById = new Map(zones.map((zone) => [zone.id, zone.name]))
 const zoneRiskById = new Map(zones.map((zone) => [zone.id, zone.status]))
 
@@ -36,11 +43,11 @@ export function planRoute(request: RouteRequest): RoutePlan {
   const to = normalizeZoneId(request.to)
 
   if (!from || !to) {
-    throw new Error('Unknown route endpoint')
+    throw new RoutePlanningError('Unknown route endpoint')
   }
 
   if (from === to) {
-    throw new Error('Start and destination must be different')
+    throw new RoutePlanningError('Start and destination must be different')
   }
 
   const queue: QueueItem[] = [{ node: from, cost: 0, path: [] }]
@@ -79,7 +86,7 @@ export function planRoute(request: RouteRequest): RoutePlan {
     }
   }
 
-  throw new Error('No accessible route found for the selected constraints')
+  throw new RoutePlanningError('No accessible route found for the selected constraints')
 }
 
 export function normalizeZoneId(input: string) {
@@ -94,7 +101,7 @@ export function normalizeZoneId(input: string) {
 }
 
 function buildRoutePlan(path: RouteEdge[], request: RouteRequest, from: string, to: string): RoutePlan {
-  const riskLevel = highestPathRisk(path)
+  const riskLevel = highestPathRisk(path, from)
   const totalMinutes = Math.ceil(
     path.reduce((sum, edge) => sum + costForEdge(edge, request), 0),
   )
@@ -121,11 +128,11 @@ function buildRoutePlan(path: RouteEdge[], request: RouteRequest, from: string, 
   }
 }
 
-function highestPathRisk(path: RouteEdge[]): RiskLevel {
+function highestPathRisk(path: RouteEdge[], startZoneId: string): RiskLevel {
   return path.reduce<RiskLevel>((highest, edge) => {
     const edgeRisk = zoneRiskById.get(edge.to) ?? 'low'
     return riskRank[edgeRisk] > riskRank[highest] ? edgeRisk : highest
-  }, 'low')
+  }, zoneRiskById.get(startZoneId) ?? 'low')
 }
 
 export function listRouteOptions() {

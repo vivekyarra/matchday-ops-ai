@@ -32,6 +32,17 @@ describe('route planner', () => {
     expect(standard.totalMinutes).toBeLessThan(wheelchair.totalMinutes)
   })
 
+  it('includes the starting zone risk in route risk', () => {
+    const plan = planRoute({
+      from: 'east-gate',
+      to: 'section-224',
+      mobility: 'standard',
+      avoidCrowds: false,
+    })
+
+    expect(plan.riskLevel).toBe('high')
+  })
+
   it('rejects unknown route endpoints', () => {
     expect(() =>
       planRoute({
@@ -41,5 +52,16 @@ describe('route planner', () => {
         avoidCrowds: true,
       }),
     ).toThrow('Unknown route endpoint')
+  })
+
+  it('rejects routes with identical endpoints', () => {
+    expect(() =>
+      planRoute({
+        from: 'north-gate',
+        to: 'north-gate',
+        mobility: 'standard',
+        avoidCrowds: true,
+      }),
+    ).toThrow('Start and destination must be different')
   })
 })

@@ -6,6 +6,7 @@ import { AccessibleRoutePlanner } from './components/AccessibleRoutePlanner'
 import { AIAssistant } from './components/AIAssistant'
 import { MetricStrip } from './components/MetricStrip'
 import { OperationsMap } from './components/OperationsMap'
+import { SignalPanel } from './components/SignalPanel'
 import { ZoneTable } from './components/ZoneTable'
 
 async function fetchSnapshot() {
@@ -90,6 +91,7 @@ export default function App() {
                 onSelectZone={setSelectedZoneId}
               />
               <ZoneTable snapshot={snapshot} selectedZoneId={selectedZone?.id ?? ''} onSelectZone={setSelectedZoneId} />
+              <SignalPanel snapshot={snapshot} />
             </div>
             <aside className="workspace-side" aria-label="Decision tools">
               <AIAssistant snapshot={snapshot} selectedZone={selectedZone} />

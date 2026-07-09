@@ -60,4 +60,34 @@ describe('api', () => {
 
     expect(response.body.steps.every((step: { accessible: boolean }) => step.accessible)).toBe(true)
   })
+
+  it('returns clean 400 errors for invalid route requests', async () => {
+    const response = await request(app)
+      .post('/api/routes/plan')
+      .send({
+        from: 'north-gate',
+        to: 'north-gate',
+        mobility: 'standard',
+        avoidCrowds: true,
+      })
+      .expect(400)
+
+    expect(response.body).toEqual({
+      error: 'Start and destination must be different',
+    })
+  })
+
+  it('bounds route endpoint input size', async () => {
+    const response = await request(app)
+      .post('/api/routes/plan')
+      .send({
+        from: 'x'.repeat(200),
+        to: 'section-224',
+        mobility: 'standard',
+        avoidCrowds: true,
+      })
+      .expect(400)
+
+    expect(response.body.error).toBe('Invalid request')
+  })
 })

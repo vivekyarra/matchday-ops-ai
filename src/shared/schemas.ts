@@ -140,8 +140,8 @@ export const DecisionResponseSchema = DecisionPayloadSchema.extend({
 })
 
 export const RouteRequestSchema = z.object({
-  from: z.string().min(2),
-  to: z.string().min(2),
+  from: z.string().trim().min(2).max(80),
+  to: z.string().trim().min(2).max(80),
   mobility: z.enum(['standard', 'wheelchair', 'low-vision', 'sensory-sensitive']).default('standard'),
   avoidCrowds: z.boolean().default(true),
 })

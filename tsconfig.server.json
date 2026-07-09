@@ -16,5 +16,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/server", "src/shared", "tests/api.test.ts", "tests/analytics.test.ts", "tests/routePlanner.test.ts"]
+  "include": ["src/server", "src/shared", "tests/**/*.test.ts"]
 }

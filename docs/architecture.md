@@ -17,6 +17,10 @@ Matchday Ops AI uses a small full-stack TypeScript architecture:
 6. The AI service either calls Gemini with grounded JSON context or returns deterministic demo-safe guidance.
 7. All AI output is validated before the API responds.
 
+## Operational signals
+
+The command view deliberately shows incident, transport, and sustainability signals alongside the map. This keeps the experience aligned to real venue work: crowd decisions should consider arrival pressure, accessible services, water and waste operations, and current incident ownership, not only density on a map.
+
 ## Safety boundary
 
-The system does not automate enforcement, surveillance, or crowd-control actions. It gives recommended next steps to staff and labels the interface as human approved. This keeps the solution aligned with responsible AI expectations for high-density public venues.
+The system does not automate enforcement, surveillance, or crowd-control actions. It gives recommended next steps to staff, records assumptions in the briefing UI, and labels the interface as human approved. This keeps the solution aligned with responsible AI expectations for high-density public venues.
