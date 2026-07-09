@@ -22,6 +22,20 @@ describe('api', () => {
     expect(response.body.zones.length).toBeGreaterThan(5)
   })
 
+  it('returns route planning options for selectable venue zones', async () => {
+    const response = await request(app).get('/api/routes/options').expect(200)
+
+    expect(response.body.zones).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'north-gate',
+          name: 'North Gate',
+          accessible: true,
+        }),
+      ]),
+    )
+  })
+
   it('validates decision support requests', async () => {
     const response = await request(app)
       .post('/api/operations/decision')

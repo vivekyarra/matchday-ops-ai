@@ -3,6 +3,6 @@ import { config } from './config'
 
 const app = createApp()
 
-app.listen(config.port, '127.0.0.1', () => {
-  console.info(`Matchday Ops AI API listening on http://127.0.0.1:${config.port}`)
+app.listen(config.port, config.host, () => {
+  console.info(`Matchday Ops AI API listening on http://${config.host}:${config.port}`)
 })

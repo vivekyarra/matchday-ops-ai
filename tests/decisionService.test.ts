@@ -43,4 +43,22 @@ describe('decision support service', () => {
 
     expect(response.publicMessage).toMatch(/[\u0600-\u06ff]/)
   })
+
+  it('marks repeated deterministic decisions as cache hits', async () => {
+    const snapshot = buildSnapshot(new Date('2026-06-19T19:00:00.000Z'))
+    const request = {
+      role: 'operations' as const,
+      language: 'en' as const,
+      urgency: 'high' as const,
+      prompt: 'Create a safe staff action plan for the current cache validation route.',
+      includePublicMessage: true,
+    }
+
+    const first = await createDecisionSupport(request, snapshot)
+    const second = await createDecisionSupport(request, snapshot)
+
+    expect(first.cacheHit).toBe(false)
+    expect(second.cacheHit).toBe(true)
+    expect(second.source).toBe('demo-rules')
+  })
 })

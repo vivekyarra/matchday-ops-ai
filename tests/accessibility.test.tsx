@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import '@testing-library/jest-dom/vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import axe from 'axe-core'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../src/client/App'
@@ -122,6 +122,54 @@ const snapshot: StadiumSnapshot = {
   },
 }
 
+const decisionResponse = {
+  summary: 'Operations should open the calm bypass and keep staff visible.',
+  riskLevel: 'high',
+  confidence: 0.82,
+  recommendedActions: [
+    {
+      priority: 'now',
+      owner: 'Crowd flow lead',
+      action: 'Open north east bypass for guest routing.',
+      rationale: 'East gate queue pressure is elevated.',
+      etaMinutes: 3,
+    },
+    {
+      priority: 'next-5-min',
+      owner: 'Accessibility captain',
+      action: 'Move mobility support to the lift queue.',
+      rationale: 'Accessible route demand is rising.',
+      etaMinutes: 5,
+    },
+  ],
+  publicMessage: 'For guests: please follow the calmer signed route.',
+  staffBriefing: 'Keep messages calm and update command every five minutes.',
+  accessibilityNote: 'Accessible support staff are moving closer.',
+  sustainabilityNote: 'Add volunteers near cup return points.',
+  assumptions: ['Human operators approve all public and staff actions before execution.'],
+  source: 'demo-rules',
+  generatedAt: '2026-06-19T19:00:00.000Z',
+  cacheHit: false,
+}
+
+const routeResponse = {
+  from: 'north-gate',
+  to: 'section-224',
+  totalMinutes: 12,
+  riskLevel: 'high',
+  steps: [
+    {
+      from: 'north-gate',
+      to: 'east-gate',
+      minutes: 7,
+      instruction: 'Use Outer concourse north-east bypass from North Gate to East Gate.',
+      accessible: true,
+      crowdNote: 'Crowd pressure is manageable.',
+    },
+  ],
+  assumptions: ['Route avoids non-accessible edges for the selected mobility need.'],
+}
+
 afterEach(() => {
   vi.unstubAllGlobals()
 })
@@ -146,4 +194,46 @@ describe('client accessibility', () => {
     })
     expect(results.violations).toHaveLength(0)
   }, 15000)
+
+  it('shows a clear alert when the snapshot request fails', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 500 })))
+
+    render(<App />)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load venue snapshot')
+  })
+
+  it('submits the existing AI briefing and route planning workflows', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input)
+
+      if (url === '/api/stadium/snapshot') {
+        return new Response(JSON.stringify(snapshot), { status: 200 })
+      }
+
+      if (url === '/api/operations/decision') {
+        return new Response(JSON.stringify(decisionResponse), { status: 200 })
+      }
+
+      if (url === '/api/routes/plan') {
+        return new Response(JSON.stringify(routeResponse), { status: 200 })
+      }
+
+      return new Response('{}', { status: 404 })
+    })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<App />)
+
+    await screen.findByText('Ops briefing')
+    await waitFor(() => expect(screen.getByRole('button', { name: /generate briefing/i })).toBeEnabled())
+
+    fireEvent.click(screen.getByRole('button', { name: /generate briefing/i }))
+    expect(await screen.findByText('Open north east bypass for guest routing.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /plan route/i }))
+    expect(await screen.findByText('12 minutes')).toBeInTheDocument()
+    expect(await screen.findByText(/Outer concourse north-east bypass/)).toBeInTheDocument()
+  })
 })
