@@ -94,7 +94,7 @@ export default function App() {
               <SignalPanel snapshot={snapshot} />
             </div>
             <aside className="workspace-side" aria-label="Decision tools">
-              <AIAssistant snapshot={snapshot} selectedZone={selectedZone} />
+              <AIAssistant selectedZone={selectedZone} />
               <AccessibleRoutePlanner zones={snapshot.zones} />
             </aside>
           </section>

@@ -30,6 +30,13 @@ const aiLimiter = rateLimit({
   legacyHeaders: false,
 })
 
+class ForbiddenOriginError extends Error {
+  constructor() {
+    super('Origin not allowed')
+    this.name = 'ForbiddenOriginError'
+  }
+}
+
 export function createApp() {
   const app = express()
 
@@ -58,7 +65,7 @@ export function createApp() {
           return
         }
 
-        callback(new Error('Origin not allowed'))
+        callback(new ForbiddenOriginError())
       },
       methods: ['GET', 'POST'],
       allowedHeaders: ['Content-Type'],
@@ -154,6 +161,20 @@ const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => 
     return
   }
 
+  if (isRequestEntityTooLargeError(error)) {
+    response.status(413).json({
+      error: 'Request body too large',
+    })
+    return
+  }
+
+  if (error instanceof ForbiddenOriginError) {
+    response.status(403).json({
+      error: 'Origin not allowed',
+    })
+    return
+  }
+
   const status = error instanceof RoutePlanningError ? 400 : 500
 
   response.status(status).json({
@@ -168,4 +189,9 @@ function isJsonParseError(error: unknown) {
 
   const maybeBodyParserError = error as { status?: unknown; type?: unknown }
   return maybeBodyParserError.status === 400 && maybeBodyParserError.type === 'entity.parse.failed'
+}
+
+function isRequestEntityTooLargeError(error: unknown) {
+  const maybeBodyParserError = error as { status?: unknown; type?: unknown }
+  return maybeBodyParserError.status === 413 && maybeBodyParserError.type === 'entity.too.large'
 }

@@ -22,6 +22,7 @@ describe('decision support service', () => {
       )
 
       expect(response.publicMessage.length).toBeGreaterThan(12)
+      expect(response.source).toBe('demo-rules')
       expect(response.recommendedActions.length).toBeGreaterThanOrEqual(2)
       expect(response.assumptions).toContain('Human operators approve all public and staff actions before execution.')
     }

@@ -9,7 +9,7 @@ describe('api', () => {
     const response = await request(app).get('/api/health').expect(200)
 
     expect(response.body.ok).toBe(true)
-    expect(response.body.aiMode).toMatch(/gemini|demo-rules/)
+    expect(response.body.aiMode).toBe('demo-rules')
     expect(response.headers['content-security-policy']).not.toContain('unsafe-inline')
     expect(JSON.stringify(response.body)).not.toContain('GEMINI_API_KEY')
   })
@@ -43,7 +43,7 @@ describe('api', () => {
       })
       .expect(200)
 
-    expect(response.body.source).toMatch(/demo-rules|gemini|gemini-fallback/)
+    expect(response.body.source).toBe('demo-rules')
     expect(response.body.recommendedActions.length).toBeGreaterThanOrEqual(2)
     expect(response.body.publicMessage).toContain('For guests')
   })
@@ -102,5 +102,34 @@ describe('api', () => {
     expect(response.body).toEqual({
       error: 'Invalid JSON body',
     })
+  })
+
+  it('returns a safe 413 error when request bodies exceed the configured limit', async () => {
+    const response = await request(app)
+      .post('/api/operations/decision')
+      .send({
+        role: 'operations',
+        language: 'en',
+        urgency: 'high',
+        prompt: 'x'.repeat(40_000),
+        includePublicMessage: true,
+      })
+      .expect(413)
+
+    expect(response.body).toEqual({
+      error: 'Request body too large',
+    })
+  })
+
+  it('rejects untrusted CORS origins without exposing cross-origin headers', async () => {
+    const response = await request(app)
+      .get('/api/health')
+      .set('Origin', 'https://untrusted.example')
+      .expect(403)
+
+    expect(response.body).toEqual({
+      error: 'Origin not allowed',
+    })
+    expect(response.headers['access-control-allow-origin']).toBeUndefined()
   })
 })

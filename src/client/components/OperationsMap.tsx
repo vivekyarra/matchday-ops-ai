@@ -39,7 +39,7 @@ export function OperationsMap({ snapshot, selectedZoneId, onSelectZone }: Operat
 
       <div className="selected-zone" aria-live="polite">
         <div>
-          <span className={`risk-dot ${selectedAssessment?.riskLevel ?? 'low'}`}></span>
+          <span className={`risk-dot ${selectedAssessment?.riskLevel ?? 'low'}`} aria-hidden="true"></span>
           <strong>{snapshot.zones.find((zone) => zone.id === selectedZoneId)?.name}</strong>
         </div>
         <p>

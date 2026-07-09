@@ -7,12 +7,10 @@ import type {
   LanguageCode,
   RiskLevel,
   Role,
-  StadiumSnapshot,
   StadiumZone,
 } from '../../shared/schemas'
 
 type AIAssistantProps = {
-  snapshot: StadiumSnapshot
   selectedZone?: StadiumZone
 }
 

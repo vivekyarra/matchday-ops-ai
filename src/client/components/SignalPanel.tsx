@@ -25,7 +25,7 @@ export function SignalPanel({ snapshot }: SignalPanelProps) {
       target: 'Target 70% diversion',
     },
     {
-      label: 'Energy load',
+      label: 'Energy headroom',
       value: 100 - snapshot.sustainability.energyLoadPercent,
       target: `${snapshot.sustainability.energyLoadPercent}% venue load`,
     },
@@ -90,7 +90,7 @@ export function SignalPanel({ snapshot }: SignalPanelProps) {
                   className="bar-track"
                   value={item.value}
                   max={100}
-                  aria-label={`${item.label} ${item.value}%`}
+                  aria-label={`${item.label} ${item.value}%; ${item.target}`}
                 />
               </div>
             ))}

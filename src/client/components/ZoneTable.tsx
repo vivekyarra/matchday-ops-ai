@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import type { StadiumSnapshot } from '../../shared/schemas'
 
 type ZoneTableProps = {
@@ -7,6 +8,8 @@ type ZoneTableProps = {
 }
 
 export function ZoneTable({ snapshot, selectedZoneId, onSelectZone }: ZoneTableProps) {
+  const zoneById = useMemo(() => new Map(snapshot.zones.map((zone) => [zone.id, zone])), [snapshot.zones])
+
   return (
     <section className="panel" aria-labelledby="zone-table-title">
       <div className="section-heading">
@@ -29,7 +32,7 @@ export function ZoneTable({ snapshot, selectedZoneId, onSelectZone }: ZoneTableP
           </thead>
           <tbody>
             {snapshot.assessments.map((assessment) => {
-              const zone = snapshot.zones.find((candidate) => candidate.id === assessment.zoneId)
+              const zone = zoneById.get(assessment.zoneId)
 
               if (!zone) {
                 return null
@@ -43,7 +46,12 @@ export function ZoneTable({ snapshot, selectedZoneId, onSelectZone }: ZoneTableP
                     </button>
                   </th>
                   <td>
-                    <span className={`tag ${assessment.riskLevel}`}>{assessment.riskScore}</span>
+                    <span
+                      className={`tag ${assessment.riskLevel}`}
+                      aria-label={`${assessment.riskLevel} risk score ${assessment.riskScore}`}
+                    >
+                      {assessment.riskScore}
+                    </span>
                   </td>
                   <td>{Math.round((zone.occupancy / zone.capacity) * 100)}%</td>
                   <td>{zone.queueMinutes}m</td>

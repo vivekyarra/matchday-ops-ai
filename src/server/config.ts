@@ -15,7 +15,7 @@ export const config = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: readNumber('PORT', 8787),
   allowedOrigin: process.env.ALLOWED_ORIGIN ?? '',
-  geminiApiKey: process.env.GEMINI_API_KEY ?? '',
+  geminiApiKey: isTestMode() ? '' : (process.env.GEMINI_API_KEY ?? ''),
   geminiModel: process.env.GEMINI_MODEL ?? 'gemini-3.5-flash',
   aiTimeoutMs: readNumber('AI_TIMEOUT_MS', 8000),
   aiCacheTtlMs: readNumber('AI_CACHE_TTL_MS', 120000),
@@ -23,4 +23,8 @@ export const config = {
 
 export function isProduction() {
   return config.nodeEnv === 'production'
+}
+
+function isTestMode() {
+  return process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 }

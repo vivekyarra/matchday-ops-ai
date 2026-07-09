@@ -133,8 +133,10 @@ function buildCacheKey(request: DecisionRequest, snapshot: StadiumSnapshot) {
 }
 
 function storeCache(cacheKey: string, response: DecisionResponse) {
+  const now = Date.now()
+
   for (const [key, record] of decisionCache.entries()) {
-    if (record.expiresAt <= Date.now()) {
+    if (record.expiresAt <= now) {
       decisionCache.delete(key)
     }
   }
@@ -150,7 +152,7 @@ function storeCache(cacheKey: string, response: DecisionResponse) {
   }
 
   decisionCache.set(cacheKey, {
-    expiresAt: Date.now() + config.aiCacheTtlMs,
+    expiresAt: now + config.aiCacheTtlMs,
     response,
   })
 }

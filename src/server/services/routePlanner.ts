@@ -17,18 +17,36 @@ export class RoutePlanningError extends Error {
 
 const zoneNameById = new Map(zones.map((zone) => [zone.id, zone.name]))
 const zoneRiskById = new Map(zones.map((zone) => [zone.id, zone.status]))
+const routeNeighborsByNode = buildRouteNeighborMap(routeEdges)
 
-function getNeighbors(node: string) {
-  const forward = routeEdges.filter((edge) => edge.from === node)
-  const backward = routeEdges
-    .filter((edge) => edge.to === node)
-    .map((edge) => ({
+function buildRouteNeighborMap(edges: RouteEdge[]) {
+  const neighbors = new Map<string, RouteEdge[]>()
+
+  function addNeighbor(node: string, edge: RouteEdge) {
+    const nodeNeighbors = neighbors.get(node)
+
+    if (nodeNeighbors) {
+      nodeNeighbors.push(edge)
+      return
+    }
+
+    neighbors.set(node, [edge])
+  }
+
+  for (const edge of edges) {
+    addNeighbor(edge.from, edge)
+    addNeighbor(edge.to, {
       ...edge,
       from: edge.to,
       to: edge.from,
-    }))
+    })
+  }
 
-  return [...forward, ...backward]
+  return neighbors
+}
+
+function getNeighbors(node: string) {
+  return routeNeighborsByNode.get(node) ?? []
 }
 
 function costForEdge(edge: RouteEdge, request: RouteRequest) {
