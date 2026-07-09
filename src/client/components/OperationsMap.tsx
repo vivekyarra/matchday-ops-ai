@@ -69,8 +69,7 @@ function ZoneButton({
   return (
     <button
       type="button"
-      className={`zone-marker ${zone.status} ${selected ? 'selected' : ''}`}
-      style={{ left: `${zone.coordinates.x}%`, top: `${zone.coordinates.y}%` }}
+      className={`zone-marker zone-${zone.id} ${zone.status} ${selected ? 'selected' : ''}`}
       onClick={() => onSelectZone(zone.id)}
       aria-pressed={selected}
       aria-label={`${zone.name}, ${zone.status} risk, ${zone.queueMinutes} minute queue`}

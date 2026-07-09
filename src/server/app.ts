@@ -43,7 +43,6 @@ export function createApp() {
           scriptSrc: ["'self'"],
           styleSrc: ["'self'"],
           styleSrcElem: ["'self'"],
-          styleSrcAttr: ["'unsafe-inline'"],
           imgSrc: ["'self'", 'data:'],
           connectSrc: ["'self'"],
         },
@@ -137,6 +136,13 @@ function serveClient(app: express.Express) {
 }
 
 const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
+  if (isJsonParseError(error)) {
+    response.status(400).json({
+      error: 'Invalid JSON body',
+    })
+    return
+  }
+
   if (error instanceof ZodError) {
     response.status(400).json({
       error: 'Invalid request',
@@ -153,4 +159,13 @@ const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => 
   response.status(status).json({
     error: status === 400 ? error.message : 'Internal server error',
   })
+}
+
+function isJsonParseError(error: unknown) {
+  if (!(error instanceof SyntaxError)) {
+    return false
+  }
+
+  const maybeBodyParserError = error as { status?: unknown; type?: unknown }
+  return maybeBodyParserError.status === 400 && maybeBodyParserError.type === 'entity.parse.failed'
 }

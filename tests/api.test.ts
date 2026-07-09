@@ -10,6 +10,7 @@ describe('api', () => {
 
     expect(response.body.ok).toBe(true)
     expect(response.body.aiMode).toMatch(/gemini|demo-rules/)
+    expect(response.headers['content-security-policy']).not.toContain('unsafe-inline')
     expect(JSON.stringify(response.body)).not.toContain('GEMINI_API_KEY')
   })
 
@@ -89,5 +90,17 @@ describe('api', () => {
       .expect(400)
 
     expect(response.body.error).toBe('Invalid request')
+  })
+
+  it('returns clean 400 errors for malformed JSON', async () => {
+    const response = await request(app)
+      .post('/api/routes/plan')
+      .set('Content-Type', 'application/json')
+      .send('{ bad json')
+      .expect(400)
+
+    expect(response.body).toEqual({
+      error: 'Invalid JSON body',
+    })
   })
 })

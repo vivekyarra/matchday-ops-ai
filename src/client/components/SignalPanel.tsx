@@ -86,16 +86,12 @@ export function SignalPanel({ snapshot }: SignalPanelProps) {
                   <strong>{item.label}</strong>
                   <span>{item.target}</span>
                 </div>
-                <div
+                <progress
                   className="bar-track"
-                  role="progressbar"
+                  value={item.value}
+                  max={100}
                   aria-label={`${item.label} ${item.value}%`}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={item.value}
-                >
-                  <span style={{ width: `${item.value}%` }}></span>
-                </div>
+                />
               </div>
             ))}
           </div>

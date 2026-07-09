@@ -291,6 +291,61 @@ main {
   line-height: 1.05;
 }
 
+.zone-north-gate {
+  left: 50%;
+  top: 9%;
+}
+
+.zone-east-gate {
+  left: 88%;
+  top: 45%;
+}
+
+.zone-south-gate {
+  left: 50%;
+  top: 91%;
+}
+
+.zone-fan-fest-plaza {
+  left: 18%;
+  top: 54%;
+}
+
+.zone-concourse-c {
+  left: 34%;
+  top: 35%;
+}
+
+.zone-section-118 {
+  left: 42%;
+  top: 51%;
+}
+
+.zone-section-224 {
+  left: 64%;
+  top: 30%;
+}
+
+.zone-access-lift-a {
+  left: 71%;
+  top: 49%;
+}
+
+.zone-medical-east {
+  left: 78%;
+  top: 61%;
+}
+
+.zone-transit-hub {
+  left: 82%;
+  top: 84%;
+}
+
+.zone-reuse-return {
+  left: 24%;
+  top: 80%;
+}
+
 .zone-marker.low {
   background: #dff7e8;
   color: #064e3b;
@@ -703,16 +758,26 @@ textarea {
 }
 
 .bar-track {
+  appearance: none;
   height: 10px;
   overflow: hidden;
+  width: 100%;
+  border: 0;
   border-radius: 999px;
   background: #dbe5dd;
 }
 
-.bar-track span {
-  display: block;
-  height: 100%;
+.bar-track::-webkit-progress-bar {
   border-radius: inherit;
+  background: #dbe5dd;
+}
+
+.bar-track::-webkit-progress-value {
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), var(--teal));
+}
+
+.bar-track::-moz-progress-bar {
   background: linear-gradient(90deg, var(--green), var(--teal));
 }
 

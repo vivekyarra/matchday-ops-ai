@@ -1,4 +1,4 @@
-import { incidents, sustainabilitySignal, venueProfile, zones } from '../data/stadium'
+import { incidents, sustainabilitySignal, transitSignals, venueProfile, zones } from '../data/stadium'
 import type {
   Incident,
   RiskLevel,
@@ -137,42 +137,9 @@ export function buildSnapshot(now = new Date()): StadiumSnapshot {
     zones,
     assessments,
     incidents,
-    transit: awaitableTransit(),
+    transit: transitSignals,
     sustainability: sustainabilitySignal,
   }
-}
-
-function awaitableTransit() {
-  return [
-    {
-      mode: 'metro' as const,
-      label: 'Blue Line inbound',
-      loadPercent: 86,
-      nextArrivalMinutes: 4,
-      status: 'high' as const,
-    },
-    {
-      mode: 'bus' as const,
-      label: 'Stadium express shuttles',
-      loadPercent: 68,
-      nextArrivalMinutes: 7,
-      status: 'medium' as const,
-    },
-    {
-      mode: 'rideshare' as const,
-      label: 'Rideshare lot C',
-      loadPercent: 52,
-      nextArrivalMinutes: 11,
-      status: 'low' as const,
-    },
-    {
-      mode: 'walk' as const,
-      label: 'Riverwalk pedestrian corridor',
-      loadPercent: 74,
-      nextArrivalMinutes: 0,
-      status: 'medium' as const,
-    },
-  ]
 }
 
 export function getHighestRiskZones(snapshot: StadiumSnapshot, count = 3) {
