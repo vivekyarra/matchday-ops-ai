@@ -29,6 +29,10 @@ describe('api', () => {
     expect(response.body.problemStatementAlignment.exactProblemStatement).toContain(
       'Build a GenAI-enabled solution',
     )
+    expect(response.body.problemStatementAlignment.coverage).toMatchObject({
+      complete: true,
+      missingRequirements: [],
+    })
     expect(response.body.problemStatementAlignment.requiredCapabilities).toEqual(
       expect.arrayContaining([
         'navigation',

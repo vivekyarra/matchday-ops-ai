@@ -39,6 +39,13 @@ type GeminiResponse = {
   }>
 }
 
+type DecisionProviderMode = 'demo-rules' | 'gemini'
+
+type DecisionSupportOptions = {
+  geminiApiKey?: string
+  now?: Date
+}
+
 const decisionCache = new Map<string, CacheRecord>()
 const maxDecisionCacheEntries = 128
 
@@ -78,8 +85,11 @@ const translations: Record<LanguageCode, { publicPrefix: string; crowd: string; 
 export async function createDecisionSupport(
   request: DecisionRequest,
   snapshot: StadiumSnapshot,
+  options: DecisionSupportOptions = {},
 ): Promise<DecisionResponse> {
-  const cacheKey = buildCacheKey(request, snapshot)
+  const geminiApiKey = options.geminiApiKey ?? config.geminiApiKey
+  const providerMode: DecisionProviderMode = geminiApiKey ? 'gemini' : 'demo-rules'
+  const cacheKey = buildCacheKey(request, snapshot, providerMode)
   const cached = decisionCache.get(cacheKey)
 
   if (cached && cached.expiresAt > Date.now()) {
@@ -89,9 +99,9 @@ export async function createDecisionSupport(
     }
   }
 
-  const generatedAt = new Date().toISOString()
+  const generatedAt = (options.now ?? new Date()).toISOString()
 
-  if (!config.geminiApiKey) {
+  if (!geminiApiKey) {
     const response = {
       ...buildRulesDecision(request, snapshot),
       source: 'demo-rules' as const,
@@ -103,7 +113,7 @@ export async function createDecisionSupport(
   }
 
   try {
-    const payload = await callGemini(request, snapshot)
+    const payload = await callGemini(request, snapshot, geminiApiKey)
     const response = {
       ...payload,
       source: 'gemini' as const,
@@ -124,7 +134,7 @@ export async function createDecisionSupport(
   }
 }
 
-function buildCacheKey(request: DecisionRequest, snapshot: StadiumSnapshot) {
+function buildCacheKey(request: DecisionRequest, snapshot: StadiumSnapshot, providerMode: DecisionProviderMode) {
   const highRisk = getHighestRiskZones(snapshot, 5).map((zone) => ({
     zoneId: zone.zoneId,
     score: zone.riskScore,
@@ -133,6 +143,7 @@ function buildCacheKey(request: DecisionRequest, snapshot: StadiumSnapshot) {
   return createHash('sha256')
     .update(
       JSON.stringify({
+        providerMode,
         request,
         metrics: snapshot.metrics,
         incidents: snapshot.incidents.map((incident) => incident.id),
@@ -216,13 +227,14 @@ function buildRulesDecision(request: DecisionRequest, snapshot: StadiumSnapshot)
 async function callGemini(
   request: DecisionRequest,
   snapshot: StadiumSnapshot,
+  geminiApiKey: string,
 ): Promise<DecisionPayload> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), config.aiTimeoutMs)
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${config.geminiModel}:generateContent?key=${encodeURIComponent(config.geminiApiKey)}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${config.geminiModel}:generateContent?key=${encodeURIComponent(geminiApiKey)}`,
       {
         method: 'POST',
         headers: {

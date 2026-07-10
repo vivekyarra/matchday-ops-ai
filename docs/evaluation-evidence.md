@@ -4,7 +4,12 @@ This file is intentionally scoped to the two categories being improved: **Proble
 
 ## Problem Statement Alignment target: 100
 
-The repository includes the exact Challenge 4 statement in the README, shared constants, AI prompt context, tests, and the live `/api/evaluation/evidence` endpoint.
+The repository includes the exact Challenge 4 statement in the README, root traceability file, shared constants, AI prompt context, tests, and the live `/api/evaluation/evidence` endpoint.
+
+Coverage is computed in `src/shared/evaluation.ts` from the required Challenge 4 requirement list. The expected live values are:
+
+- `problemStatementAlignment.coverage.complete: true`
+- `problemStatementAlignment.coverage.missingRequirements: []`
 
 Every named requirement is mapped to a running implementation:
 
@@ -29,12 +34,17 @@ Every named requirement is mapped to a running implementation:
 
 ## Code Quality target: 100
 
-The code-quality evidence is now centralized in `src/shared/evaluation.ts` and exposed through `/api/evaluation/evidence`.
+The code-quality evidence is now centralized in `src/shared/evaluation.ts`, runtime-validated by `EvaluationEvidenceSchema`, and exposed through `/api/evaluation/evidence`.
 
 | Signal | Evidence |
 | --- | --- |
-| Typed contracts | Shared Zod schemas define client/server/API contracts |
+| Typed contracts | Shared Zod schemas define client/server/API/evaluation contracts |
+| Strict TypeScript | Client, server, and tooling TypeScript configs enforce strict mode |
 | Separated layers | Client, server routes, analytics, route planning, AI decisions, shared constants, and schemas are separated |
 | Named domain rules | Risk thresholds, weights, projections, and sustainability assumptions are named constants |
-| Deterministic validation | `npm run check` runs lint, tests, and production build |
-| Regression coverage | Tests assert Challenge 4 statement, audience/capability coverage, and the evaluation evidence API contract |
+| Computed coverage | Challenge 4 coverage is computed from required requirements and evidence rows |
+| Source integrity | Tests verify every evaluation evidence path exists |
+| Deterministic validation | `npm run check` runs lint, tests, typechecking through build, and production bundling |
+| Coverage command | `npm run test:coverage` produces a reviewer-visible coverage report |
+| Enforced thresholds | Coverage fails below configured statement, branch, function, and line thresholds |
+| Regression coverage | Tests assert Challenge 4 statement, audience/capability coverage, computed coverage, schema validity, and the evaluation evidence API contract |

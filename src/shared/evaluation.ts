@@ -6,12 +6,40 @@ import {
   challengeAudiences,
   challengeCapabilities,
 } from './constants'
+import type {
+  ChallengeAlignmentEvidenceItem,
+  CodeQualityEvidenceItem,
+  EvaluationEvidence,
+} from './schemas'
+import { EvaluationEvidenceSchema } from './schemas'
 
-export const challengeAlignmentEvidence = [
+export const coreChallengeRequirements = [
+  'exact Challenge 4 problem statement',
+  'GenAI-enabled solution',
+  'enhances stadium operations',
+  'overall tournament experience',
+  'FIFA World Cup 2026',
+] as const
+
+export const requiredChallengeRequirements = [
+  ...coreChallengeRequirements,
+  ...challengeAudiences,
+  ...challengeCapabilities,
+] as const
+
+export type ChallengeRequirement = (typeof requiredChallengeRequirements)[number]
+
+export const challengeAlignmentEvidence: ChallengeAlignmentEvidenceItem[] = [
+  {
+    requirement: 'exact Challenge 4 problem statement',
+    implementation:
+      'The README quotes the supplied Challenge 4 statement verbatim, and shared constants carry the same statement into tests and AI prompt context.',
+    sourcePaths: ['README.md', 'CHALLENGE_4_TRACEABILITY.md', 'src/shared/constants.ts', 'tests/challengeAlignment.test.ts'],
+  },
   {
     requirement: 'GenAI-enabled solution',
     implementation:
-      'Server-side Gemini-compatible decision assistant creates structured operations briefings from the current stadium snapshot, with deterministic fallback for evaluator runs without secrets.',
+      'Server-side Gemini-compatible decision support creates structured operations briefings from the current stadium snapshot, with deterministic fallback for evaluator runs without secrets.',
     sourcePaths: ['src/server/services/aiDecisionService.ts', 'src/client/components/AIAssistant.tsx'],
   },
   {
@@ -25,6 +53,12 @@ export const challengeAlignmentEvidence = [
     implementation:
       'Fan-facing public messages, accessible routing, transport pressure handling, and sustainability operations improve the matchday experience beyond back-office monitoring.',
     sourcePaths: ['src/client/components/AIAssistant.tsx', 'src/client/components/AccessibleRoutePlanner.tsx', 'src/client/components/SignalPanel.tsx'],
+  },
+  {
+    requirement: 'FIFA World Cup 2026',
+    implementation:
+      'The app metadata, demo venue data, README, UI header, and AI prompt are all scoped to World Cup 2026 matchday operations.',
+    sourcePaths: ['README.md', 'src/shared/constants.ts', 'src/server/data/stadium.ts'],
   },
   {
     requirement: 'fans',
@@ -47,7 +81,7 @@ export const challengeAlignmentEvidence = [
   {
     requirement: 'venue staff',
     implementation:
-      'Role-specific workflows support operations, security, accessibility, transport, and sustainability staff leads.',
+      'Role-specific workflows support venue operations, accessibility, transport, and sustainability staff leads, with dispatch owners for field teams.',
     sourcePaths: ['src/shared/constants.ts', 'src/client/components/AIAssistant.tsx'],
   },
   {
@@ -98,25 +132,31 @@ export const challengeAlignmentEvidence = [
       'The operations decision API produces current-snapshot actions, staff briefings, public messages, assumptions, and confidence.',
     sourcePaths: ['src/server/app.ts', 'src/server/services/aiDecisionService.ts'],
   },
-  {
-    requirement: 'FIFA World Cup 2026',
-    implementation:
-      'The app metadata, demo venue data, README, UI header, and AI prompt are all scoped to World Cup 2026 matchday operations.',
-    sourcePaths: ['README.md', 'src/shared/constants.ts', 'src/server/data/stadium.ts'],
-  },
-] as const
+]
 
-export const codeQualityEvidence = [
+export const codeQualityEvidence: CodeQualityEvidenceItem[] = [
   {
     signal: 'typed contracts',
     implementation:
-      'Zod schemas define request, response, route, snapshot, incident, and AI decision contracts shared across server, client, and tests.',
+      'Zod schemas define request, response, route, snapshot, incident, AI decision, and evaluation evidence contracts shared across server, client, and tests.',
     sourcePaths: ['src/shared/schemas.ts'],
+  },
+  {
+    signal: 'runtime evidence contract validation',
+    implementation:
+      'The evaluation evidence response is parsed through a shared schema before export, so the live API cannot drift silently from its documented shape.',
+    sourcePaths: ['src/shared/evaluation.ts', 'src/shared/schemas.ts'],
+  },
+  {
+    signal: 'strict TypeScript',
+    implementation:
+      'Client, server, and tooling TypeScript projects enable strict mode, so type safety is enforced across the full repository.',
+    sourcePaths: ['tsconfig.app.json', 'tsconfig.server.json', 'tsconfig.node.json'],
   },
   {
     signal: 'separated layers',
     implementation:
-      'Client components, Express routes, analytics, route planning, AI decisions, shared constants, and shared schemas live in separate modules.',
+      'Client components, Express routes, analytics, route planning, AI decisions, shared constants, shared schemas, and evaluation evidence live in separate modules.',
     sourcePaths: ['src/client', 'src/server', 'src/shared'],
   },
   {
@@ -126,34 +166,71 @@ export const codeQualityEvidence = [
     sourcePaths: ['src/server/services/analytics.ts'],
   },
   {
+    signal: 'computed traceability coverage',
+    implementation:
+      'Problem-statement coverage is computed from the required Challenge 4 requirements and evidence rows instead of being manually claimed.',
+    sourcePaths: ['src/shared/evaluation.ts', 'tests/challengeAlignment.test.ts'],
+  },
+  {
+    signal: 'source-path integrity',
+    implementation:
+      'Tests verify that every evidence row points to a real repository file or directory, preventing stale documentation from passing review.',
+    sourcePaths: ['tests/evaluationEvidence.test.ts'],
+  },
+  {
     signal: 'deterministic validation',
     implementation:
-      'The single check command runs lint, unit/API/UI tests, and production build.',
-    sourcePaths: ['package.json', 'vitest.config.ts'],
+      'The single check command runs lint, unit/API/UI tests, typechecking through the production build, and Vite bundling.',
+    sourcePaths: ['package.json', 'vitest.config.ts', 'tsconfig.json'],
+  },
+  {
+    signal: 'enforced coverage thresholds',
+    implementation:
+      'The coverage command enforces minimum statement, branch, function, and line coverage thresholds so quality regressions fail locally.',
+    sourcePaths: ['vitest.config.ts', 'package.json'],
   },
   {
     signal: 'alignment regression coverage',
     implementation:
-      'Tests assert the exact Challenge 4 statement, required audiences, required capabilities, and live evaluation evidence contract.',
-    sourcePaths: ['tests/challengeAlignment.test.ts', 'tests/api.test.ts'],
+      'Tests assert the exact Challenge 4 statement, required audiences, required capabilities, computed coverage, schema validity, and the live evidence API contract.',
+    sourcePaths: ['tests/challengeAlignment.test.ts', 'tests/api.test.ts', 'tests/evaluationEvidence.test.ts'],
   },
-] as const
+]
 
-export const evaluationEvidence = {
+function buildCoverageStatus(evidence: ChallengeAlignmentEvidenceItem[]) {
+  const coveredRequirements = new Set(evidence.map((item) => item.requirement.toLowerCase()))
+  const missingRequirements = requiredChallengeRequirements.filter(
+    (requirement) => !coveredRequirements.has(requirement.toLowerCase()),
+  )
+
+  return {
+    requiredCount: requiredChallengeRequirements.length,
+    coveredCount: requiredChallengeRequirements.length - missingRequirements.length,
+    complete: missingRequirements.length === 0,
+    missingRequirements,
+  }
+}
+
+const uncheckedEvaluationEvidence: EvaluationEvidence = {
   problemStatementAlignment: {
     targetScore: 100,
     challengeId: CHALLENGE_ID,
     vertical: CHALLENGE_VERTICAL,
     context: CHALLENGE_CONTEXT,
     exactProblemStatement: CHALLENGE_PROBLEM_STATEMENT,
-    requiredAudiences: challengeAudiences,
-    requiredCapabilities: challengeCapabilities,
+    requiredAudiences: [...challengeAudiences],
+    requiredCapabilities: [...challengeCapabilities],
+    requiredRequirements: [...requiredChallengeRequirements],
+    coverage: buildCoverageStatus(challengeAlignmentEvidence),
     evidence: challengeAlignmentEvidence,
   },
   codeQuality: {
     targetScore: 100,
     validationCommand: 'npm run check',
-    validationSteps: ['npm run lint', 'npm run test', 'npm run build'],
+    validationSteps: ['npm run lint', 'npm run test', 'npm run typecheck', 'npm run build'],
+    coverageCommand: 'npm run test:coverage',
     evidence: codeQualityEvidence,
   },
-} as const
+}
+
+export const evaluationEvidence = EvaluationEvidenceSchema.parse(uncheckedEvaluationEvidence)

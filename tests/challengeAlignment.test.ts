@@ -33,8 +33,11 @@ describe('Challenge 4 alignment', () => {
 
   it('maps every Challenge 4 audience and capability to implementation evidence', () => {
     const requirements = challengeAlignmentEvidence.map((item) => item.requirement)
+    const alignment = evaluationEvidence.problemStatementAlignment
 
-    expect(evaluationEvidence.problemStatementAlignment.targetScore).toBe(100)
+    expect(alignment.targetScore).toBe(100)
+    expect(alignment.coverage.complete).toBe(true)
+    expect(alignment.coverage.missingRequirements).toEqual([])
     expect(new Set(requirements).size).toBe(requirements.length)
 
     for (const audience of challengeAudiences) {

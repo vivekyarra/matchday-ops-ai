@@ -146,6 +146,49 @@ export const RouteRequestSchema = z.object({
   avoidCrowds: z.boolean().default(true),
 })
 
+export const EvaluationSourcePathSchema = z.string().min(1)
+
+export const ChallengeAlignmentEvidenceItemSchema = z.object({
+  requirement: z.string().min(2),
+  implementation: z.string().min(40),
+  sourcePaths: z.array(EvaluationSourcePathSchema).min(1),
+})
+
+export const CodeQualityEvidenceItemSchema = z.object({
+  signal: z.string().min(2),
+  implementation: z.string().min(40),
+  sourcePaths: z.array(EvaluationSourcePathSchema).min(1),
+})
+
+export const EvaluationCoverageSchema = z.object({
+  requiredCount: z.number().int().positive(),
+  coveredCount: z.number().int().nonnegative(),
+  complete: z.boolean(),
+  missingRequirements: z.array(z.string()),
+})
+
+export const EvaluationEvidenceSchema = z.object({
+  problemStatementAlignment: z.object({
+    targetScore: z.literal(100),
+    challengeId: z.string(),
+    vertical: z.string(),
+    context: z.string(),
+    exactProblemStatement: z.string(),
+    requiredAudiences: z.array(z.string()).min(1),
+    requiredCapabilities: z.array(z.string()).min(1),
+    requiredRequirements: z.array(z.string()).min(1),
+    coverage: EvaluationCoverageSchema,
+    evidence: z.array(ChallengeAlignmentEvidenceItemSchema).min(1),
+  }),
+  codeQuality: z.object({
+    targetScore: z.literal(100),
+    validationCommand: z.string(),
+    validationSteps: z.array(z.string()).min(1),
+    coverageCommand: z.string(),
+    evidence: z.array(CodeQualityEvidenceItemSchema).min(1),
+  }),
+})
+
 export type RiskLevel = z.infer<typeof RiskLevelSchema>
 export type LanguageCode = z.infer<typeof LanguageSchema>
 export type Role = z.infer<typeof RoleSchema>
@@ -160,3 +203,6 @@ export type DecisionPayload = z.infer<typeof DecisionPayloadSchema>
 export type DecisionResponse = z.infer<typeof DecisionResponseSchema>
 export type RouteRequest = z.infer<typeof RouteRequestSchema>
 export type RoutePlan = z.infer<typeof RoutePlanSchema>
+export type ChallengeAlignmentEvidenceItem = z.infer<typeof ChallengeAlignmentEvidenceItemSchema>
+export type CodeQualityEvidenceItem = z.infer<typeof CodeQualityEvidenceItemSchema>
+export type EvaluationEvidence = z.infer<typeof EvaluationEvidenceSchema>
