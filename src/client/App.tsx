@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Activity, RefreshCw, ShieldCheck } from 'lucide-react'
-import { APP_NAME, CHALLENGE_VERTICAL } from '../shared/constants'
+import {
+  APP_NAME,
+  CHALLENGE_CONTEXT,
+  CHALLENGE_ID,
+  CHALLENGE_VERTICAL,
+  challengeCapabilities,
+} from '../shared/constants'
 import type { StadiumSnapshot } from '../shared/schemas'
 import { AccessibleRoutePlanner } from './components/AccessibleRoutePlanner'
 import { AIAssistant } from './components/AIAssistant'
@@ -50,11 +56,13 @@ export default function App() {
     <main>
       <header className="app-header" aria-labelledby="page-title">
         <div>
-          <p className="eyebrow">{CHALLENGE_VERTICAL}</p>
+          <p className="eyebrow">
+            {CHALLENGE_ID}: {CHALLENGE_VERTICAL}
+          </p>
           <h1 id="page-title">{APP_NAME}</h1>
           <p className="header-copy">
-            Harbor Park Stadium command view for crowd flow, accessibility, transport, and
-            sustainability during a World Cup 2026 matchday.
+            GenAI-enabled {CHALLENGE_CONTEXT} command view for {challengeCapabilities.join(', ')}
+            during stadium and tournament operations.
           </p>
         </div>
         <div className="header-actions" aria-label="System status">

@@ -10,7 +10,17 @@ import type {
   StadiumSnapshot,
 } from '../../shared/schemas'
 import { DecisionPayloadSchema } from '../../shared/schemas'
-import { languageOptions, riskRank, roleLabels } from '../../shared/constants'
+import {
+  CHALLENGE_CONTEXT,
+  CHALLENGE_ID,
+  CHALLENGE_PROBLEM_STATEMENT,
+  CHALLENGE_VERTICAL,
+  challengeAudiences,
+  challengeCapabilities,
+  languageOptions,
+  riskRank,
+  roleLabels,
+} from '../../shared/constants'
 
 type CacheRecord = {
   expiresAt: number
@@ -223,7 +233,9 @@ async function callGemini(
             parts: [
               {
                 text: [
-                  'You are a stadium operations decision support assistant for World Cup 2026 matchdays.',
+                  `You are a stadium operations decision support assistant for ${CHALLENGE_CONTEXT} matchdays.`,
+                  `${CHALLENGE_ID}: ${CHALLENGE_VERTICAL}.`,
+                  CHALLENGE_PROBLEM_STATEMENT,
                   'Return only valid JSON matching the requested fields.',
                   'Use only the supplied venue snapshot. Do not claim live integrations that are not present.',
                   'Do not include secrets, credentials, surveillance advice, or unsafe crowd-control tactics.',
@@ -279,6 +291,13 @@ function buildPrompt(request: DecisionRequest, snapshot: StadiumSnapshot) {
       language,
       prompt: request.prompt.slice(0, 1200),
       includePublicMessage: request.includePublicMessage,
+    },
+    challengeAlignment: {
+      id: CHALLENGE_ID,
+      vertical: CHALLENGE_VERTICAL,
+      context: CHALLENGE_CONTEXT,
+      audiences: challengeAudiences,
+      capabilities: challengeCapabilities,
     },
     requiredJsonShape: {
       summary: 'string',

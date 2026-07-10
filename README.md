@@ -6,6 +6,12 @@ Matchday Ops AI is a GenAI-enabled stadium operations command center for the FIF
 
 It gives venue staff a live operating picture for crowd flow, accessibility, transport, sustainability, and incident response. The system combines deterministic venue analytics with a server-side Gemini-compatible decision assistant so every AI recommendation is grounded in the current stadium snapshot and still requires human approval.
 
+## Challenge 4 problem statement
+
+**[Challenge 4] Smart Stadiums & Tournament Operations**
+
+Build a GenAI-enabled solution that enhances stadium operations and the overall tournament experience for fans, organizers, volunteers, or venue staff. The solution must leverage Generative AI to improve navigation, crowd management, accessibility, transportation, sustainability, multilingual assistance, operational intelligence, or real-time decision support during the FIFA World Cup 2026.
+
 ## Chosen vertical
 
 **Smart Stadiums & Tournament Operations**
@@ -18,6 +24,29 @@ The project focuses on venue staff and organizers during matchday operations. It
 - Transport and arrival pressure monitoring
 - Sustainability operations, including water, waste, energy, and reusable cup return signals
 - Real-time decision support for operations, security, accessibility, transport, and sustainability leads
+
+## Problem statement alignment
+
+This repository covers every named part of Challenge 4 in the running product, not just in documentation.
+
+| Challenge 4 requirement | Where it is implemented |
+| --- | --- |
+| GenAI-enabled solution | Server-side Gemini-compatible decision assistant in `src/server/services/aiDecisionService.ts`, with deterministic fallback for evaluator runs without secrets |
+| Enhances stadium operations | Live operations map, zone priorities, incident ownership, staffing gaps, queue pressure, and dispatch recommendations |
+| Improves tournament experience | Fan-facing public message generation, accessible route guidance, transport pressure handling, and sustainability operations |
+| Fans | Public multilingual guidance and route planning workflows |
+| Organizers | Venue-wide metrics, readiness signals, and assumptions for command-level decisions |
+| Volunteers | Recommended actions include owners, priorities, rationales, and ETAs for field teams |
+| Venue staff | Role-specific prompts for operations, security, accessibility, transport, and sustainability leads |
+| Navigation | Accessible weighted route planner across stadium zones |
+| Crowd management | Risk scoring from load, queue time, staffing, incidents, and projected occupancy |
+| Accessibility | Mobility-aware routing and accessibility support notes in AI briefings |
+| Transportation | Transit signals and arrival pressure in the command dashboard |
+| Sustainability | Water, waste, energy, and reusable cup return signals in snapshot metrics and briefings |
+| Multilingual assistance | English, Spanish, French, Arabic, Hindi, and Portuguese public messages |
+| Operational intelligence | Deterministic snapshot analytics, risk drivers, incident context, and service-readiness metrics |
+| Real-time decision support | `/api/operations/decision` produces structured actions from the current stadium snapshot |
+| FIFA World Cup 2026 | App metadata, prompt context, README, and demo venue data are all scoped to World Cup 2026 matchday operations |
 
 ## Approach and logic
 
@@ -156,9 +185,9 @@ Current test coverage focus:
 
 | Parameter | How this repository addresses it |
 | --- | --- |
-| Code Quality | Typed React and Express code, shared schemas, separated client/server/domain layers, focused tests |
+| Code Quality | Typed React and Express code, shared schemas, named domain constants for scoring thresholds and weights, separated client/server/domain layers, focused unit/API/UI tests, and a single `npm run check` validation path |
 | Security | Server-side AI key, validation, rate limits, Helmet, CORS, body limits, no PII or biometrics |
 | Efficiency | Cached AI decisions, compact snapshots, deterministic scoring, lightweight graph routing |
 | Testing | Unit, API, and accessibility smoke tests plus build/lint scripts |
 | Accessibility | Semantic UI, keyboard focus, native controls, accessible route logic, axe test |
-| Problem Statement Alignment | Directly targets stadium operations, crowd management, multilingual assistance, accessibility, transportation, sustainability, and decision support |
+| Problem Statement Alignment | Full Challenge 4 coverage: GenAI-enabled stadium operations for fans, organizers, volunteers, and venue staff across navigation, crowd management, accessibility, transportation, sustainability, multilingual assistance, operational intelligence, and real-time decision support for FIFA World Cup 2026 |

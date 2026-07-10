@@ -10,20 +10,56 @@ import { riskRank } from '../../shared/constants'
 
 const riskLabels: RiskLevel[] = ['low', 'medium', 'high', 'critical']
 
+const riskThresholds = {
+  medium: 45,
+  high: 68,
+  critical: 84,
+} as const
+
+const zoneRiskWeights = {
+  occupancy: 48,
+  queuePressure: 20,
+  staffGap: 14,
+  incidentSeverity: 12,
+  accessibilityDrag: 4,
+  sensorDrag: 2,
+} as const
+
+const queuePressureMaxMinutes = 40
+const nonAccessibleZonePenalty = 0.75
+
+const occupancyProjection = {
+  ingressPulse: 0.08,
+  defaultPulse: 0.04,
+  queuePulseDivisor: 100,
+  minQueuePulse: 0.02,
+  maxQueuePulse: 0.12,
+  capacityBuffer: 1.12,
+} as const
+
+const sustainabilityWeights = {
+  energyLoad: 0.25,
+  wasteGap: 0.35,
+  cupReturnGap: 0.25,
+  refillOverTarget: 0.15,
+} as const
+
+const refillUtilizationTarget = 85
+
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
 
 export function riskLevelFromScore(score: number): RiskLevel {
-  if (score >= 84) {
+  if (score >= riskThresholds.critical) {
     return 'critical'
   }
 
-  if (score >= 68) {
+  if (score >= riskThresholds.high) {
     return 'high'
   }
 
-  if (score >= 45) {
+  if (score >= riskThresholds.medium) {
     return 'medium'
   }
 
@@ -39,20 +75,22 @@ function strongestIncidentLevel(zoneIncidents: Incident[]): RiskLevel {
 export function calculateZoneRisk(zone: StadiumZone, activeIncidents: Incident[]): ZoneAssessment {
   const zoneIncidents = activeIncidents.filter((incident) => incident.zoneId === zone.id)
   const occupancyRatio = zone.occupancy / zone.capacity
-  const queuePressure = clamp(zone.queueMinutes / 40, 0, 1)
+  const queuePressure = clamp(zone.queueMinutes / queuePressureMaxMinutes, 0, 1)
   const staffGap = clamp((zone.staffNeeded - zone.staffAvailable) / zone.staffNeeded, 0, 1)
   const incidentScore = riskLabels.indexOf(strongestIncidentLevel(zoneIncidents)) / (riskLabels.length - 1)
-  const accessibilityDrag = zone.accessible ? clamp((100 - zone.accessibilityScore) / 100, 0, 1) : 0.75
+  const accessibilityDrag = zone.accessible
+    ? clamp((100 - zone.accessibilityScore) / 100, 0, 1)
+    : nonAccessibleZonePenalty
   const sensorDrag = clamp((100 - zone.sensorHealth) / 100, 0, 1)
 
   const riskScore = Math.round(
     clamp(
-      occupancyRatio * 48 +
-        queuePressure * 20 +
-        staffGap * 14 +
-        incidentScore * 12 +
-        accessibilityDrag * 4 +
-        sensorDrag * 2,
+      occupancyRatio * zoneRiskWeights.occupancy +
+        queuePressure * zoneRiskWeights.queuePressure +
+        staffGap * zoneRiskWeights.staffGap +
+        incidentScore * zoneRiskWeights.incidentSeverity +
+        accessibilityDrag * zoneRiskWeights.accessibilityDrag +
+        sensorDrag * zoneRiskWeights.sensorDrag,
       0,
       100,
     ),
@@ -94,9 +132,23 @@ export function calculateZoneRisk(zone: StadiumZone, activeIncidents: Incident[]
 }
 
 function projectOccupancy(zone: StadiumZone) {
-  const ingressPulse = zone.type === 'gate' || zone.type === 'fan-zone' ? 0.08 : 0.04
-  const queuePulse = clamp(zone.queueMinutes / 100, 0.02, 0.12)
-  return Math.round(clamp(zone.occupancy * (1 + ingressPulse + queuePulse), 0, zone.capacity * 1.12))
+  const ingressPulse =
+    zone.type === 'gate' || zone.type === 'fan-zone'
+      ? occupancyProjection.ingressPulse
+      : occupancyProjection.defaultPulse
+  const queuePulse = clamp(
+    zone.queueMinutes / occupancyProjection.queuePulseDivisor,
+    occupancyProjection.minQueuePulse,
+    occupancyProjection.maxQueuePulse,
+  )
+
+  return Math.round(
+    clamp(
+      zone.occupancy * (1 + ingressPulse + queuePulse),
+      0,
+      zone.capacity * occupancyProjection.capacityBuffer,
+    ),
+  )
 }
 
 export function buildSnapshot(now = new Date()): StadiumSnapshot {
@@ -115,10 +167,11 @@ export function buildSnapshot(now = new Date()): StadiumSnapshot {
 
   const sustainabilityScore = Math.round(
     100 -
-      (sustainabilitySignal.energyLoadPercent * 0.25 +
-        (100 - sustainabilitySignal.wasteDiversionRate) * 0.35 +
-        (100 - sustainabilitySignal.reusableCupReturnRate) * 0.25 +
-        Math.max(sustainabilitySignal.waterRefillUtilization - 85, 0) * 0.15),
+      (sustainabilitySignal.energyLoadPercent * sustainabilityWeights.energyLoad +
+        (100 - sustainabilitySignal.wasteDiversionRate) * sustainabilityWeights.wasteGap +
+        (100 - sustainabilitySignal.reusableCupReturnRate) * sustainabilityWeights.cupReturnGap +
+        Math.max(sustainabilitySignal.waterRefillUtilization - refillUtilizationTarget, 0) *
+          sustainabilityWeights.refillOverTarget),
   )
 
   return {

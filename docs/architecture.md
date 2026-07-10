@@ -7,6 +7,10 @@ Matchday Ops AI uses a small full-stack TypeScript architecture:
 - `src/shared`: Zod schemas, shared types, and constants used by both sides.
 - `tests`: unit, API, and accessibility tests.
 
+## Challenge 4 alignment
+
+The product is scoped directly to **[Challenge 4] Smart Stadiums & Tournament Operations** for **FIFA World Cup 2026**. The shared constants, README, UI header, and AI prompt all carry the same challenge context so the implementation stays anchored to stadium operations, navigation, crowd management, accessibility, transportation, sustainability, multilingual assistance, operational intelligence, and real-time decision support for fans, organizers, volunteers, and venue staff.
+
 ## Data flow
 
 1. Demo stadium data is stored in `src/server/data/stadium.ts`.

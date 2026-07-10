@@ -2,6 +2,8 @@
 
 - Public GitHub repository: https://github.com/vivekyarra/matchday-ops-ai
 - Complete project code in repository
+- Challenge 4 problem statement is quoted exactly in the README
+- Every named Challenge 4 audience and capability is mapped to a running feature
 - README includes chosen vertical
 - README explains approach and logic
 - README explains how the solution works
