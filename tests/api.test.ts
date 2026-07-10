@@ -22,6 +22,30 @@ describe('api', () => {
     expect(response.body.zones.length).toBeGreaterThan(5)
   })
 
+  it('returns machine-readable evaluation evidence for alignment and code quality', async () => {
+    const response = await request(app).get('/api/evaluation/evidence').expect(200)
+
+    expect(response.body.problemStatementAlignment.targetScore).toBe(100)
+    expect(response.body.problemStatementAlignment.exactProblemStatement).toContain(
+      'Build a GenAI-enabled solution',
+    )
+    expect(response.body.problemStatementAlignment.requiredCapabilities).toEqual(
+      expect.arrayContaining([
+        'navigation',
+        'crowd management',
+        'accessibility',
+        'transportation',
+        'sustainability',
+        'multilingual assistance',
+        'operational intelligence',
+        'real-time decision support',
+      ]),
+    )
+    expect(response.body.codeQuality.targetScore).toBe(100)
+    expect(response.body.codeQuality.validationCommand).toBe('npm run check')
+    expect(response.body.codeQuality.evidence.length).toBeGreaterThanOrEqual(5)
+  })
+
   it('returns route planning options for selectable venue zones', async () => {
     const response = await request(app).get('/api/routes/options').expect(200)
 

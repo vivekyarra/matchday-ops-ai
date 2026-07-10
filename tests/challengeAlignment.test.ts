@@ -9,6 +9,7 @@ import {
   challengeAudiences,
   challengeCapabilities,
 } from '../src/shared/constants'
+import { challengeAlignmentEvidence, evaluationEvidence } from '../src/shared/evaluation'
 
 const readme = readFileSync(join(process.cwd(), 'README.md'), 'utf8').toLowerCase()
 
@@ -27,6 +28,26 @@ describe('Challenge 4 alignment', () => {
 
     for (const capability of challengeCapabilities) {
       expect(readme).toContain(capability)
+    }
+  })
+
+  it('maps every Challenge 4 audience and capability to implementation evidence', () => {
+    const requirements = challengeAlignmentEvidence.map((item) => item.requirement)
+
+    expect(evaluationEvidence.problemStatementAlignment.targetScore).toBe(100)
+    expect(new Set(requirements).size).toBe(requirements.length)
+
+    for (const audience of challengeAudiences) {
+      expect(requirements).toContain(audience)
+    }
+
+    for (const capability of challengeCapabilities) {
+      expect(requirements).toContain(capability)
+    }
+
+    for (const item of challengeAlignmentEvidence) {
+      expect(item.implementation.length).toBeGreaterThan(40)
+      expect(item.sourcePaths.length).toBeGreaterThan(0)
     }
   })
 })

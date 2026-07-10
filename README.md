@@ -28,6 +28,7 @@ The project focuses on venue staff and organizers during matchday operations. It
 ## Problem statement alignment
 
 This repository covers every named part of Challenge 4 in the running product, not just in documentation.
+The same evidence is exposed for automated review at `/api/evaluation/evidence` and summarized in [`docs/evaluation-evidence.md`](docs/evaluation-evidence.md).
 
 | Challenge 4 requirement | Where it is implemented |
 | --- | --- |
@@ -185,9 +186,9 @@ Current test coverage focus:
 
 | Parameter | How this repository addresses it |
 | --- | --- |
-| Code Quality | Typed React and Express code, shared schemas, named domain constants for scoring thresholds and weights, separated client/server/domain layers, focused unit/API/UI tests, and a single `npm run check` validation path |
+| Code Quality | Typed React and Express code, shared schemas, centralized evaluation evidence, named domain constants for scoring thresholds and weights, separated client/server/domain layers, focused unit/API/UI/API-contract tests, and a single `npm run check` validation path |
 | Security | Server-side AI key, validation, rate limits, Helmet, CORS, body limits, no PII or biometrics |
 | Efficiency | Cached AI decisions, compact snapshots, deterministic scoring, lightweight graph routing |
 | Testing | Unit, API, and accessibility smoke tests plus build/lint scripts |
 | Accessibility | Semantic UI, keyboard focus, native controls, accessible route logic, axe test |
-| Problem Statement Alignment | Full Challenge 4 coverage: GenAI-enabled stadium operations for fans, organizers, volunteers, and venue staff across navigation, crowd management, accessibility, transportation, sustainability, multilingual assistance, operational intelligence, and real-time decision support for FIFA World Cup 2026 |
+| Problem Statement Alignment | Full Challenge 4 coverage in README, UI, AI prompt context, tests, and `/api/evaluation/evidence`: GenAI-enabled stadium operations for fans, organizers, volunteers, and venue staff across navigation, crowd management, accessibility, transportation, sustainability, multilingual assistance, operational intelligence, and real-time decision support for FIFA World Cup 2026 |

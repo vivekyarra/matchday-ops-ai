@@ -4,6 +4,7 @@
 - Complete project code in repository
 - Challenge 4 problem statement is quoted exactly in the README
 - Every named Challenge 4 audience and capability is mapped to a running feature
+- `/api/evaluation/evidence` exposes machine-readable Problem Statement Alignment and Code Quality evidence
 - README includes chosen vertical
 - README explains approach and logic
 - README explains how the solution works

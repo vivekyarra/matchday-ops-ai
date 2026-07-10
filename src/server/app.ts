@@ -12,6 +12,7 @@ import { buildSnapshot } from './services/analytics'
 import { createDecisionSupport } from './services/aiDecisionService'
 import { listRouteOptions, planRoute, RoutePlanningError } from './services/routePlanner'
 import { DecisionRequestSchema, RouteRequestSchema } from '../shared/schemas'
+import { evaluationEvidence } from '../shared/evaluation'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -85,6 +86,10 @@ export function createApp() {
 
   app.get('/api/stadium/snapshot', (_request, response) => {
     response.json(buildSnapshot())
+  })
+
+  app.get('/api/evaluation/evidence', (_request, response) => {
+    response.json(evaluationEvidence)
   })
 
   app.get('/api/routes/options', (_request, response) => {
